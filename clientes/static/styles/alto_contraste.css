@@ -1,0 +1,137 @@
+/* ----- Estrutura base ----- */
+.alto-contraste {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* ----- Links ----- */
+.alto-contraste a {
+    color: #FFFF00 !important;
+    text-decoration: underline !important;
+}
+
+/* ----- Campos de formulário ----- */
+.alto-contraste input:not([type="checkbox"]):not([type="radio"]),
+.alto-contraste select,
+.alto-contraste textarea {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    border: 2px solid #ffffff !important;
+}
+
+/* ----- Botões padrão ----- */
+.alto-contraste .btn-primary {
+    background-color: #000000 !important;
+    color: #FFFF00 !important;
+    border: 2px solid #007bff !important;
+}
+
+.alto-contraste .btn-primary:hover,
+.alto-contraste .btn-primary:focus {
+    background-color: #007bff !important;
+    color: #FFFF00 !important;
+    border-color: #FFFF00 !important;
+}
+
+/* Botão de alto contraste (sempre visível) */
+#toggle-contrast {
+    background: #FFD700 !important;
+    color: #000 !important;
+    border: 2px solid #000 !important;
+    font-weight: bold;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 9999;
+}
+
+#toggle-contrast:hover,
+#toggle-contrast:focus {
+    background: #FFEB3B !important;
+    outline: 2px solid #000 !important;
+}
+
+/* ----- Botões de ação ----- */
+.alto-contraste .btn-success {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    text-decoration: underline !important;
+    border: 2px solid #28a745 !important;
+}
+
+.alto-contraste .btn-success:hover,
+.alto-contraste .btn-success:focus {
+    background-color: #28a745 !important;
+    color: #000000 !important;
+    text-decoration: none !important;
+    border-color: #FFFFFF !important;
+}
+
+.alto-contraste .btn-secondary {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+    text-decoration: underline !important;
+    border: 2px solid #dc3545 !important;
+}
+
+.alto-contraste .btn-secondary:hover,
+.alto-contraste .btn-secondary:focus {
+    background-color: #dc3545 !important;
+    color: #000000 !important;
+    text-decoration: none !important;
+    border-color: #FFFFFF !important;
+}
+
+/* ----- DataTables ----- */
+.alto-contraste .dataTables_wrapper table.dataTable {
+    background-color: #000000 !important;
+    border: 1px solid #FFFF00 !important;
+}
+
+.alto-contraste .dataTables_wrapper table.dataTable th,
+.alto-contraste .dataTables_wrapper table.dataTable td {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-color: #FFFF00 !important;
+}
+
+.alto-contraste .dataTables_wrapper table.dataTable thead th {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border-bottom: 2px solid #FFFF00 !important;
+}
+
+/* Hover e interações */
+.alto-contraste .dataTables_wrapper table.dataTable tbody tr:hover {
+    background-color: #1a1a1a !important;
+}
+
+/* Paginação */
+.alto-contraste .dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: #000 !important;
+    color: #FFFF00 !important;
+    border: 1px solid #FFFF00 !important;
+    text-decoration: underline !important;
+}
+
+.alto-contraste .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #FFFF00 !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+}
+
+.alto-contraste .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #FFFF00 !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+    font-weight: bold !important;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.table-responsive table {
+  min-width: 100%;
+}

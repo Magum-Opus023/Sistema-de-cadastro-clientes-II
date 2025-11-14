@@ -1,0 +1,11 @@
+{% extends 'clientes/index.html' %}
+
+{% block title %}Página inicial{% endblock %}
+
+{% block content %}
+<div class="text-center mt-5">
+    <h1 class="mb-4">Bem-vindo ao Sistema de Cadastro de Clientes!</h1>
+    <p class="lead">Cadastre, edite e acompanhe seus clientes com facilidade.</p>
+    <a href="{% url 'cliente_list' %}" class="btn btn-primary btn-lg mt-4">Clique aqui para visualizar clientes</a>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'clientes/index.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Login</h2>
+    {% if error %}
+  <div class="alert alert-danger text-center" role="alert">
+    {{ error }}
+  </div>
+{% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_username" class="form-label">Usuário</label>
+            <input type="text" name="username" id="id_username" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label for="id_password" class="form-label">Senha</label>
+            <input type="password" name="password" id="id_password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Entrar</button>
+    </form>
+
+    <p class="mt-3">Não tem uma conta? <a href="{% url 'registro' %}">Registre-se</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% load static %}
+{% load tz %}
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Cadastro de Clientes{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    
+
+
+    <!-- CSS Acessibilidade -->
+    <link href="{% static 'styles/alto_contraste.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/tabela_ajustada.css' %}">
+    <link href="{% static 'styles/aria.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'styles/ajustes_gerais.css' %}">
+</head>
+
+<body class="d-flex flex-column min-vh-100" tabindex="0">
+
+    <a href="#conteudo-principal" class="skip-link">
+        Pular para o conteúdo principal
+    </a>
+    
+    <div id="barra-acessibilidade" class="p-2 bg-dark text-white d-flex gap-2">
+        <button id="increase-font" class="btn btn-light btn-sm" aria-label="Aumentar fonte">A+</button>
+        <button id="decrease-font" class="btn btn-light btn-sm" aria-label="Diminuir fonte">A-</button>
+        <button id="toggle-contrast" class="btn btn-warning btn-sm" aria-label="Ativar alto contraste">Contraste</button>
+        <button id="reset-accessibility" class="btn btn-secondary btn-sm" aria-label="Resetar configurações de acessibilidade">Resetar</button>
+    </div>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" role="navigation" aria-label="Menu principal">
+      <div class="container-fluid">
+          <a class="navbar-brand" href="{% url 'pagina_inicial' %}">Gerenciador de Clientes</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                  aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menu de navegação">
+              <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav me-auto">
+                  <li class="nav-item">
+                      <a class="nav-link" href="{% url 'cliente_list' %}">Lista de Clientes</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="{% url 'criar_cliente' %}">Adicionar Cliente</a>
+                  </li>
+              </ul>
+
+              <ul class="navbar-nav ms-auto align-items-center">
+                  <!-- Botão de Dark Mode -->
+                  <li class="nav-item me-2">
+                      <button id="toggle-dark" class="btn btn-outline-light" aria-label="Alternar modo escuro">
+                          <i class="bi bi-moon-fill" aria-hidden="true"></i>
+                      </button>
+                  </li>
+
+                  {% if user.is_authenticated %}
+                      <li class="nav-item d-flex align-items-center me-2 text-white">
+                          <i class="bi bi-person-circle me-1" aria-hidden="true"></i> 
+                          <span>Olá, {{ user.username }}!</span>
+                      </li>
+                      <li class="nav-item">
+                          <form id="logout-form" method="post" action="{% url 'logout' %}">
+                              {% csrf_token %}
+                              <button type="button" class="btn btn-outline-light" onclick="confirmarLogout()" aria-label="Sair da conta">Sair</button>
+                          </form>
+                      </li>
+                  {% else %}
+                      <li class="nav-item">
+                          <a href="{% url 'login' %}" class="btn btn-outline-light ms-2" aria-label="Fazer login">Login</a>
+                      </li>
+                  {% endif %}
+              </ul>
+          </div>
+      </div>
+  </nav>
+
+  {% block extra_js %}{% endblock %}
+
+  <main id="conteudo-principal" role="main" tabindex="-1" class="container mt-4 flex-grow-1">
+      {% block content %}
+      {% endblock %}
+  </main>
+
+  <footer role="contentinfo" class="footer mt-auto py-3 bg-dark text-light text-center">
+      <div class="container">
+          <p class="mb-0">&copy; {{ now|date:"Y" }} - Sistema de Cadastro de Clientes</p>
+      </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+      function confirmarLogout() {
+          Swal.fire({
+              title: 'Tem certeza?',
+              text: "Você quer sair da sua conta!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'Sim, sair!',
+              cancelButtonText: 'Cancelar'
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  document.getElementById('logout-form').submit();
+              }
+          });
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+          const html = document.documentElement;
+          const toggleButton = document.getElementById("toggle-dark");
+          const icon = toggleButton.querySelector("i");
+
+
+          if (localStorage.getItem("theme") === "dark") {
+              html.setAttribute("data-bs-theme", "dark");
+              icon.classList.replace("bi-moon-fill", "bi-sun-fill");
+          }
+
+          toggleButton.addEventListener("click", function() {
+              let currentTheme = html.getAttribute("data-bs-theme");
+              let newTheme = (currentTheme === "light") ? "dark" : "light";
+              html.setAttribute("data-bs-theme", newTheme);
+              localStorage.setItem("theme", newTheme);
+
+              if (newTheme === "dark") {
+                  icon.classList.replace("bi-moon-fill", "bi-sun-fill");
+              } else {
+                  icon.classList.replace("bi-sun-fill", "bi-moon-fill");
+              }
+          });
+      });
+  </script>
+  <script>
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Tab") {
+      const focusableElements = document.querySelectorAll(
+        'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+      );
+
+      if (focusableElements.length === 0) return;
+
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        last.focus();
+        e.preventDefault();
+      }
+
+      if (!e.shiftKey && document.activeElement === last) {
+        first.focus();
+        e.preventDefault();
+      }
+    }
+  });
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const barra = document.getElementById("barra-acessibilidade");
+    const navbar = document.querySelector("nav.navbar");
+    
+    if (barra && navbar) {
+        const ajustarEspacamento = () => {
+            const alturaBarra = barra.offsetHeight || 0;
+            const alturaNavbar = navbar.offsetHeight || 0;
+            document.body.style.paddingTop = `${alturaBarra + alturaNavbar}px`;
+        };
+
+        ajustarEspacamento();
+
+        window.addEventListener("resize", ajustarEspacamento);
+
+        // Observa mudanças dinâmicas (como mudança de fonte, contraste, etc)
+        const observer = new MutationObserver(ajustarEspacamento);
+        observer.observe(barra, { attributes: true, childList: true, subtree: true });
+    }
+});
+</script>
+
+    <script src="{% static 'js/acessibilidade.js' %}"></script>
+    <script src="{% static 'js/tabela_ajustada_tooltip.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js" defer></script>
+
+
+</body>
+</html>

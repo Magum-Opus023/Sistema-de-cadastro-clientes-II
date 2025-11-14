@@ -1,0 +1,11 @@
+{% extends 'clientes/index.html' %}
+
+{% block title %}Logout{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h2 class="mb-4">Logout</h2>
+    <p>Você saiu da sua conta.</p>
+    <a href="{% url 'login' %}" class="btn btn-primary mt-3">Fazer Login novamente</a>
+</div>
+{% endblock %}

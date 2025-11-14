@@ -1,0 +1,13 @@
+# Arquivos do ambiente virtual
+venv/
+
+# Arquivos do banco de dados local
+db.sqlite3
+
+# Arquivos do Django
+__pycache__/
+*.pyc
+*.pyo
+
+# Configurações do VSCode
+.vscode/

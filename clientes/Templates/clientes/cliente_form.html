@@ -1,0 +1,155 @@
+  {% extends 'clientes/index.html' %}
+  {% load form_filters %}
+  {% load static %}
+
+  {% block botao_lista_clientes %}
+  <a href="{% url 'cliente_list' %}" class="btn btn-outline-secondary" aria-label="Ir para a lista de clientes">
+    Lista de Clientes
+  </a>
+  {% endblock %}
+
+  {% block title %}
+    {% if form.instance.pk %}
+      Editar Cliente
+    {% else %}
+      Cadastro de Cliente
+    {% endif %}
+  {% endblock %}
+
+  {% block content %}
+  <div class="container mt-4" role="main" aria-labelledby="titulo-formulario">
+      <h2 id="titulo-formulario" class="mb-4">
+        {% if form.instance.pk %}
+          Editar Cliente
+        {% else %}
+          Cadastro de Cliente
+        {% endif %}
+      </h2>
+
+      {% if form.errors %}
+        <div class="alert alert-danger" role="alert" aria-live="assertive">
+          <h3 class="visually-hidden">Erros encontrados no formulário:</h3>
+          <ul class="mb-0">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <form method="post" class="row g-3" novalidate aria-describedby="instrucao-formulario">
+          {% csrf_token %}
+          <p id="instrucao-formulario" class="form-text text-muted">
+              Todos os campos marcados são obrigatórios. Use a tecla <kbd>Tab</kbd> para navegar entre os campos.
+          </p>
+
+          <div class="col-md-6">
+              <label for="id_nome" class="form-label">Nome <span aria-hidden="true">*</span></label>
+              {{ form.nome|add_class:"form-control"}}
+          </div>
+
+          <div class="col-md-6">
+              <label for="id_cpf" class="form-label">CPF <span aria-hidden="true">*</span></label>
+              {{ form.cpf|add_class:"form-control"}}
+          </div>
+
+          <div class="col-md-6">
+              <label for="id_email" class="form-label">Email <span aria-hidden="true">*</span></label>
+              {{ form.email|add_class:"form-control"}}
+              <small id="ajuda-email" class="form-text text-muted">
+                Exemplo: usuario@dominio.com
+              </small>
+          </div>
+
+          <div class="col-md-6">
+              <label for="id_telefone" class="form-label">Telefone <span aria-hidden="true">*</span></label>
+              {{ form.telefone|add_class:"form-control"}}
+          </div>
+
+          <div class="col-md-6">
+              <label for="id_cep" class="form-label">CEP <span aria-hidden="true">*</span></label>
+              {{ form.cep|add_class:"form-control"}}
+              <small id="ajuda-cep" class="form-text text-muted">
+                Digite o CEP para preencher automaticamente o endereço.
+              </small>
+          </div>
+
+          <div class="col-md-6">
+              <label for="id_endereco" class="form-label">Endereço <span aria-hidden="true">*</span></label>
+              {{ form.endereco|add_class:"form-control"}}
+          </div>
+
+          <div class="col-md-6">
+              <label for="id_aniversario" class="form-label">Aniversário <span aria-hidden="true">*</span></label>
+              {{ form.aniversario|add_class:"form-control"}}
+          </div>
+
+          <div class="col-md-6">
+              <label for="id_pagamento" class="form-label">Forma de Pagamento</label>
+              {{ form.pagamento|add_class:"form-select" }}
+          </div>
+
+          <div class="col-12">
+              <label for="id_observacoes" class="form-label">Observações</label>
+              {{ form.observacoes|add_class:"form-control"}}
+          </div>
+
+          <div class="col-12 d-grid gap-2 d-md-block mt-3">
+              <button type="submit" class="btn btn-success" aria-label="{% if form.instance.pk %}Salvar alterações do cliente{% else %}Cadastrar novo cliente{% endif %}">
+                {% if form.instance.pk %}
+                  Salvar Alterações
+                {% else %}
+                  Cadastrar Cliente
+                {% endif %}
+              </button>
+              <a href="{% url 'cliente_list' %}" class="btn btn-secondary" aria-label="Cancelar e voltar para a lista de clientes">
+                Cancelar
+              </a>
+          </div>
+      </form>
+  </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+      const cepInput = document.getElementById("id_cep");
+      const enderecoInput = document.getElementById("id_endereco");
+
+      cepInput.addEventListener("blur", function() {
+          const cep = cepInput.value.replace(/\D/g, "");
+          if (cep.length === 8) {
+              fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                  .then(response => response.json())
+                  .then(data => {
+                      if (!data.erro) {
+                          enderecoInput.value = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
+                          enderecoInput.setAttribute("aria-live", "polite");
+                      } else {
+                          alert("CEP não encontrado!");
+                      }
+                  })
+                  .catch(err => console.error("Erro ao buscar CEP:", err));
+          }
+      });
+  });
+  </script>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const pagamentoSelect = document.querySelector('select[name="pagamento"]');
+      if (pagamentoSelect) {
+          const firstOption = pagamentoSelect.querySelector('option[value=""]');
+          if (firstOption) {
+              firstOption.disabled = true;
+              firstOption.hidden = true;
+          }
+      }
+  });
+  </script>
+
+  <script src="{% static 'js/mascara_formulario.js' %}"></script>
+  {% endblock %}
