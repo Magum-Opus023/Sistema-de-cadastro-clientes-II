@@ -12,6 +12,8 @@ class Cliente(models.Model):
     observacoes = models.TextField(blank=True, null=True)
     usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name="clientes")
 
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
     PAGAMENTO_CHOICES = [
         ('À Vista', 'À Vista'),
         ('PIX', 'PIX'),

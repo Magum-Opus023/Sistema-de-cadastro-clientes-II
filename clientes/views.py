@@ -12,6 +12,8 @@ from django.contrib.auth.models import User
 from datetime import date, timedelta
 from django.utils.timezone import now
 from django.db.models.functions import ExtractMonth, ExtractDay
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
 
 # Create your views here.
 
@@ -110,3 +112,60 @@ def excluir_cliente(request, pk):
             return JsonResponse({'mensagem': 'Cliente excluído com sucesso!'})
         return redirect('cliente_list')
     return render(request, 'clientes/cliente_confirm_delete.html', {'cliente': cliente})
+
+@login_required
+def dashboard(request):
+    clientes = Cliente.objects.filter(usuario=request.user)
+
+    # Total
+    total_clientes = clientes.count()
+
+    # Crescimento por mês
+    clientes_por_mes = (
+        clientes
+        .annotate(mes=TruncMonth('data_criacao'))
+        .values('mes')
+        .annotate(total=Count('id'))
+        .order_by('mes')
+    )
+
+    labels = []
+    dados = []
+
+    for item in clientes_por_mes:
+        labels.append(item['mes'].strftime('%b/%Y'))
+        dados.append(item['total'])
+    
+    pagamentos = (
+    clientes
+    .exclude(pagamento__isnull=True)
+    .exclude(pagamento__exact='')
+    .values('pagamento')
+    .annotate(total=Count('id'))
+    )
+    labels_pagamento = []
+    dados_pagamento = []
+    
+    for p in pagamentos:
+        if p['pagamento']:
+            labels_pagamento.append(p['pagamento'])
+            dados_pagamento.append(p['total'])
+    if not labels_pagamento:
+        labels_pagamento = ['Sem dados']
+        dados_pagamento = [1]
+    pagamento_mais_usado = None
+
+    if dados_pagamento:
+        max_index = dados_pagamento.index(max(dados_pagamento))
+        pagamento_mais_usado = labels_pagamento[max_index]
+
+    context = {
+        'total_clientes': total_clientes,
+        'labels': labels,
+        'dados': dados,
+        'labels_pagamento': labels_pagamento,
+        'dados_pagamento': dados_pagamento,
+        'pagamento_mais_usado': pagamento_mais_usado,
+    }
+
+    return render(request, 'clientes/dashboard.html', context)

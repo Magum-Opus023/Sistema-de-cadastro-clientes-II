@@ -1,0 +1,87 @@
+{% extends 'clientes/index.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">Dashboard</h2>
+
+<div class="row mb-4">
+    <!-- Card Total -->
+    <div class="col-md-4">
+        <div class="card shadow text-center">
+            <div class="card-body">
+                <h5>Total de Clientes</h5>
+                <h2>{{ total_clientes }}</h2>
+            </div>
+        </div>
+    </div>
+    {% if pagamento_mais_usado %}
+<div class="alert alert-info text-center">
+    💡 Forma de pagamento mais utilizada: <strong>{{ pagamento_mais_usado }}</strong>
+</div>
+{% endif %}
+    <!-- Gráfico Pizza -->
+    <div class="col-md-8">
+        <div class="card shadow p-3">
+            <h5 class="text-center">Formas de Pagamento</h5>
+            <canvas id="graficoPizza"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Gráfico de Crescimento -->
+<div class="card shadow p-3">
+    <canvas id="graficoCrescimento"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+(function() {
+    // Gráfico de crescimento
+    const labels = {{ labels|default:"[]"|safe }};
+    const dados = {{ dados|default:"[]"|safe }};
+
+    new Chart(document.getElementById('graficoCrescimento'), {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Clientes cadastrados',
+                data: dados,
+                tension: 0.3
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            return Number.isInteger(value) ? value : null;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Gráfico de pizza
+    const labelsPizza = {{ labels_pagamento|default:"[]"|safe }};
+    const dadosPizza = {{ dados_pagamento|default:"[]"|safe }};
+
+    new Chart(document.getElementById('graficoPizza'), {
+        type: 'pie',
+        data: {
+            labels: labelsPizza,
+            datasets: [{
+                data: dadosPizza
+            }]
+        }
+    });
+})();
+</script>
+
+{% endblock %}
