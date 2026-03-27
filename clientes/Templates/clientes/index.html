@@ -19,6 +19,8 @@
     <link rel="stylesheet" href="{% static 'styles/tabela_ajustada.css' %}">
     <link href="{% static 'styles/aria.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'styles/ajustes_gerais.css' %}">
+    
+    {% block extra_css %}{% endblock %}
 </head>
 
 <body class="d-flex flex-column min-vh-100" tabindex="0">

@@ -1,4 +1,9 @@
 {% extends 'clientes/index.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/dashboard.css' %}">
+{% endblock %}
 
 {% block title %}Dashboard{% endblock %}
 
@@ -6,81 +11,147 @@
 
 <h2 class="mb-4">Dashboard</h2>
 
-<div class="row mb-4">
-    <!-- Card Total -->
-    <div class="col-md-4">
-        <div class="card shadow text-center">
-            <div class="card-body">
-                <h5>Total de Clientes</h5>
+<div class="container mt-4">
+
+    <div class="row mb-4">
+        <div class="col-md-4 mx-auto">
+            <div class="card dashboard-card text-center">
+                <h6>Total de Clientes</h6>
                 <h2>{{ total_clientes }}</h2>
             </div>
         </div>
     </div>
+
     {% if pagamento_mais_usado %}
-<div class="alert alert-info text-center">
-    💡 Forma de pagamento mais utilizada: <strong>{{ pagamento_mais_usado }}</strong>
-</div>
-{% endif %}
-    <!-- Gráfico Pizza -->
-    <div class="col-md-8">
-        <div class="card shadow p-3">
-            <h5 class="text-center">Formas de Pagamento</h5>
-            <canvas id="graficoPizza"></canvas>
+    <div class="alert alert-info text-center shadow-sm">
+        Forma(s) de pagamento mais utilizada(s): <strong>{{ pagamento_mais_usado }}</strong>
+    </div>
+    {% endif %}
+
+    <!-- Linha + Barra -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <h6 class="text-center mb-3">Crescimento de Clientes</h6>
+                <canvas id="graficoCrescimento"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card dashboard-card">
+                <h6 class="text-center mb-3">Clientes por Mês</h6>
+                <canvas id="graficoBarra"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pizza -->
+    <div class="row mt-4">
+    <div class="col-md-6 mx-auto">
+        <div class="card dashboard-card">
+            <h6 class="text-center mb-3">Formas de Pagamento</h6>
+
+            {% if tem_dados_pagamento %}
+                <canvas id="graficoPizza"></canvas>
+            {% else %}
+                <div class="text-center text-muted p-4">
+                    <i class="bi bi-pie-chart fs-1"></i>
+                    <p class="mt-2 mb-0">Nenhum dado de pagamento</p>
+                    <small>Adicione clientes com forma de pagamento</small>
+                </div>
+            {% endif %}
+
         </div>
     </div>
 </div>
-
-<!-- Gráfico de Crescimento -->
-<div class="card shadow p-3">
-    <canvas id="graficoCrescimento"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 (function() {
-    // Gráfico de crescimento
+
     const labels = {{ labels|default:"[]"|safe }};
     const dados = {{ dados|default:"[]"|safe }};
 
+    const labelsPizza = {{ labels_pagamento|default:"[]"|safe }};
+    const dadosPizza = {{ dados_pagamento|default:"[]"|safe }};
+
+    // 📈 Linha
     new Chart(document.getElementById('graficoCrescimento'), {
         type: 'line',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Clientes cadastrados',
+                label: 'Clientes',
                 data: dados,
-                tension: 0.3
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59,130,246,0.2)',
+                tension: 0.4,
+                fill: true
             }]
         },
         options: {
+            animation: { duration: 1200 },
             scales: {
                 y: {
                     beginAtZero: true,
                     ticks: {
                         stepSize: 1,
-                        callback: function(value) {
-                            return Number.isInteger(value) ? value : null;
-                        }
+                        callback: value => Number.isInteger(value) ? value : null
                     }
                 }
             }
         }
     });
 
-    // Gráfico de pizza
-    const labelsPizza = {{ labels_pagamento|default:"[]"|safe }};
-    const dadosPizza = {{ dados_pagamento|default:"[]"|safe }};
+    // 📊 Barra
+    new Chart(document.getElementById('graficoBarra'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Clientes por mês',
+                data: dados,
+                backgroundColor: '#22c55e'
+            }]
+        },
+        options: {
+            animation: { duration: 1200 },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
 
+    // 🥧 Pizza
+    const canvasPizza = document.getElementById('graficoPizza');
+
+    if (canvasPizza && dadosPizza.length > 0) {
     new Chart(document.getElementById('graficoPizza'), {
         type: 'pie',
         data: {
             labels: labelsPizza,
             datasets: [{
-                data: dadosPizza
+                data: dadosPizza,
+                backgroundColor: [
+                    '#3b82f6',
+                    '#22c55e',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#8b5cf6'
+                ]
             }]
+        },
+        options: {
+            animation: { duration: 1200 }
         }
     });
+}
+
 })();
 </script>
 

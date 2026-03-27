@@ -9,11 +9,17 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from datetime import date, timedelta
 from django.utils.timezone import now
 from django.db.models.functions import ExtractMonth, ExtractDay
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Cliente
+from .serializers import ClienteSerializer
 
 # Create your views here.
 
@@ -32,16 +38,21 @@ def login_view(request):
 
 def registrar_view(request):
     if request.method == "POST":
-        form = FormularioRegistro(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             print("Usuário criado:", user.username)
             login(request, user)
             return redirect('pagina_inicial')
         else:
-             print("Formulário inválido:", form.errors)
+            print("Formulário inválido:", form.errors)
     else:
-        form = FormularioRegistro()
+        form = UserCreationForm()
+
+    form.fields['username'].label = "Usuário"
+    form.fields['password1'].label = "Senha"
+    form.fields['password2'].label = "Confirmar senha"
+
     return render(request, 'contas/registro.html', {'form': form})
 
 def logout_view(request):
@@ -150,14 +161,24 @@ def dashboard(request):
         if p['pagamento']:
             labels_pagamento.append(p['pagamento'])
             dados_pagamento.append(p['total'])
-    if not labels_pagamento:
-        labels_pagamento = ['Sem dados']
-        dados_pagamento = [1]
+
+    tem_dados_pagamento = bool(labels_pagamento)
+
     pagamento_mais_usado = None
 
     if dados_pagamento:
-        max_index = dados_pagamento.index(max(dados_pagamento))
-        pagamento_mais_usado = labels_pagamento[max_index]
+        max_valor = max(dados_pagamento)
+
+        mais_usados = [
+            labels_pagamento[i]
+            for i, valor in enumerate(dados_pagamento)
+            if valor == max_valor
+        ]
+
+        if len(mais_usados) == 1:
+            pagamento_mais_usado = mais_usados[0]
+        else:
+            pagamento_mais_usado = " / ".join(mais_usados)
 
     context = {
         'total_clientes': total_clientes,
@@ -166,6 +187,14 @@ def dashboard(request):
         'labels_pagamento': labels_pagamento,
         'dados_pagamento': dados_pagamento,
         'pagamento_mais_usado': pagamento_mais_usado,
+        'tem_dados_pagamento': tem_dados_pagamento,
     }
 
     return render(request, 'clientes/dashboard.html', context)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def api_clientes(request):
+    clientes = Cliente.objects.filter(usuario=request.user)
+    serializer = ClienteSerializer(clientes, many=True)
+    return Response(serializer.data)
